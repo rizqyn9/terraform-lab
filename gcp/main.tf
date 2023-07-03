@@ -15,6 +15,18 @@ provider "google" {
   zone    = var.zone
 }
 
+resource "google_compute_firewall" "instance" {
+  name    = "terraform-example-instance"
+  network = "default"
+
+  source_ranges = ["0.0.0.0/0"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080"]
+  }
+}
+
 resource "google_compute_network" "vpc_network" {
   name = "terraform-network"
 }
@@ -26,13 +38,15 @@ resource "google_compute_instance" "vm_instance" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-11"
+      image = "ubuntu-2004-lts"
     }
   }
 
   network_interface {
-    network = google_compute_network.vpc_network.name
+    network = "default"
     access_config {
     }
   }
+
+  metadata_startup_script = "echo 'Hello, World' > index.html ; nohup busybox httpd -f -p 8080 &"
 }
