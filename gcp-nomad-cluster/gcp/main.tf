@@ -1,4 +1,6 @@
 provider "google" {
+  credentials = file(var.credentials_file)
+
   project = var.project
   region  = var.region
   zone    = var.zone
@@ -23,6 +25,11 @@ resource "google_compute_firewall" "consul_nomad_ui_ingress" {
   allow {
     protocol = "tcp"
     ports    = [8500]
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = [80, 443, 433, 8081, 8080]
   }
 }
 
